@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="dep/bukkit.jar"/>
+	<classpathentry kind="lib" path="dep/mysql.jar"/>
+	<classpathentry kind="lib" path="dep/EssentialsGroupManager.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="dep/Permissions.jar" sourcepath="/home/antony/workspace/Permissions/src"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

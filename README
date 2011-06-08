@@ -1,0 +1,5 @@
+Warrant
+www.districtmine.net
+Programmer: Ant59
+
+Warrant grants permissions to players upon login, according to database records and passes this to GroupManager. This allows users to have their groups set using forum/community engines on the web, and then synced to the server.
