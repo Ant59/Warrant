@@ -7,8 +7,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import net.districtmine.warrant.WarrantLogger;
+import net.districtmine.warrant.WarrantSql;
+
 public class DatabaseHandler {
-	private mysqlCore core;  
+	private WarrantSql core;  
 	private Connection connection;
 	private String dblocation;
 	private String username;
@@ -16,7 +19,7 @@ public class DatabaseHandler {
 	private String database;
 	  
 	  
-	public DatabaseHandler(mysqlCore core, String dbLocation, String database, String username, String password) {
+	public DatabaseHandler(WarrantSql core, String dbLocation, String database, String username, String password) {
 		this.core = core;
 		this.dblocation = dbLocation;
 		this.database = database;
@@ -29,9 +32,9 @@ public class DatabaseHandler {
 			Class.forName("com.mysql.jdbc.Driver");
 			connection = DriverManager.getConnection("jdbc:mysql://" + dblocation + "/" + database, username, password);
 	    } catch (ClassNotFoundException e) {
-	    	core.writeError("ClassNotFoundException! " + e.getMessage(), true);
+	    	WarrantLogger.mysqlError("ClassNotFoundException! " + e.getMessage());
 	    } catch (SQLException e) {
-	    	core.writeError("SQLException! " + e.getMessage(), true);
+	    	WarrantLogger.mysqlError("SQLException! " + e.getMessage());
 	    }
 	}
 
@@ -41,11 +44,11 @@ public class DatabaseHandler {
 				openConnection();
 				return true;
 			} catch (MalformedURLException ex) {
-				core.writeError("MalformedURLException! " + ex.getMessage(), true);
+				WarrantLogger.mysqlError("MalformedURLException! " + ex.getMessage());
 			} catch (InstantiationException ex) {
-				core.writeError("InstantiationExceptioon! " + ex.getMessage(), true);
+				WarrantLogger.mysqlError("InstantiationExceptioon! " + ex.getMessage());
 			} catch (IllegalAccessException ex) {
-				core.writeError("IllegalAccessException! " + ex.getMessage(), true);
+				WarrantLogger.mysqlError("IllegalAccessException! " + ex.getMessage());
 			}
 			return false;
 	    }
@@ -57,7 +60,7 @@ public class DatabaseHandler {
 			if (connection != null)
 				connection.close();
 		} catch (Exception e) {
-			core.writeError("Failed to close database connection! " + e.getMessage(), true);
+			WarrantLogger.mysqlError("Failed to close database connection! " + e.getMessage());
 		}
 	}
 	
@@ -77,7 +80,7 @@ public class DatabaseHandler {
 		    
 		    return result;
 		} catch (SQLException ex) {
-			core.writeError("Error at SQL Query: " + ex.getMessage(), false);
+			WarrantLogger.mysqlWarning("Error at SQL Query: " + ex.getMessage());
 		}
 		return null;
 	}
@@ -92,7 +95,7 @@ public class DatabaseHandler {
 		    
 		} catch (SQLException ex) {
 			
-				if (!ex.toString().contains("not return ResultSet")) core.writeError("Error at SQL INSERT Query: " + ex, false);
+				if (!ex.toString().contains("not return ResultSet")) WarrantLogger.mysqlWarning("Error at SQL INSERT Query: " + ex);
 			
 			
 		}
@@ -108,7 +111,7 @@ public class DatabaseHandler {
 		    
 		} catch (SQLException ex) {
 			
-				if (!ex.toString().contains("not return ResultSet")) core.writeError("Error at SQL UPDATE Query: " + ex, false);
+				if (!ex.toString().contains("not return ResultSet")) WarrantLogger.mysqlWarning("Error at SQL UPDATE Query: " + ex);
 			
 		}
 	}
@@ -123,7 +126,7 @@ public class DatabaseHandler {
 		    
 		} catch (SQLException ex) {
 			
-				if (!ex.toString().contains("not return ResultSet")) core.writeError("Error at SQL DELETE Query: " + ex, false);
+				if (!ex.toString().contains("not return ResultSet")) WarrantLogger.mysqlWarning("Error at SQL DELETE Query: " + ex);
 			
 		}
 	}
@@ -141,7 +144,7 @@ public class DatabaseHandler {
 			if (ex.getMessage().contains("exist")) {
 				return false;
 			} else {
-				core.writeError("Error at SQL Query: " + ex.getMessage(), false);
+				WarrantLogger.mysqlWarning("Error at SQL Query: " + ex.getMessage());
 			}
 		}
 		
@@ -153,7 +156,7 @@ public class DatabaseHandler {
 	public Boolean wipeTable(String table) throws MalformedURLException, InstantiationException, IllegalAccessException {
 		try {
 			if (!core.checkTable(table)) {
-				core.writeError("Error at Wipe Table: table, " + table + ", does not exist", true);
+				WarrantLogger.mysqlError("Error at Wipe Table: table, " + table + ", does not exist");
 				return false;
 			}
 			Connection connection = getConnection();
@@ -163,20 +166,20 @@ public class DatabaseHandler {
 		    
 		    return true;
 		} catch (SQLException ex) {
-			if (!ex.toString().contains("not return ResultSet")) core.writeError("Error at SQL WIPE TABLE Query: " + ex, false);
+			if (!ex.toString().contains("not return ResultSet")) WarrantLogger.mysqlWarning("Error at SQL WIPE TABLE Query: " + ex);
 			return false;
 		}
 	}
 	
 	public Boolean createTable(String query) {
 		try {
-			if (query == null) { core.writeError("SQL Create Table query empty.", true); return false; }
+			if (query == null) { WarrantLogger.mysqlError("SQL Create Table query empty."); return false; }
 		    
 			Statement statement = connection.createStatement();
 		    statement.execute(query);
 		    return true;
 		} catch (SQLException ex){
-			core.writeError(ex.getMessage(), true);
+			WarrantLogger.mysqlError(ex.getMessage());
 			return false;
 		}
 	}

@@ -11,10 +11,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 
-import com.alta189.sqlLibrary.MySQL.mysqlCore;
 
 public class Warrant extends JavaPlugin {
-	public mysqlCore mysql;
+	public WarrantSql mysql;
 	
 	// Plugin
 	private static String name;
@@ -24,7 +23,7 @@ public class Warrant extends JavaPlugin {
 	private static PluginDescriptionFile pd;
 	private static PluginManager pm;
 
-	private final WarrantListener playerListener = new WarrantListener(this);
+	private final WarrantListener playerListener = new WarrantListener();
 
 	@Override
 	public void onEnable() {
@@ -57,7 +56,7 @@ public class Warrant extends JavaPlugin {
         
 		WarrantPermissionsHandler.initialize(this);
 		
-		pm.registerEvent(Event.Type.PLAYER_PRELOGIN, this.playerListener, Priority.Low, this);
+		pm.registerEvent(Event.Type.PLAYER_LOGIN, this.playerListener, Priority.Low, this);
 		
     	WarrantLogger.info("Enabled");
 	}
