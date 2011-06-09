@@ -2,60 +2,76 @@
 
 package net.districtmine.warrant;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.util.HashMap;
-import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import org.anjocaido.groupmanager.GroupManager;
-import org.anjocaido.groupmanager.data.Group;
-import org.anjocaido.groupmanager.data.User;
-import org.anjocaido.groupmanager.dataholder.worlds.WorldsHolder;
-import org.anjocaido.groupmanager.dataholder.OverloadedWorldHolder;
-
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
 
 import com.alta189.sqlLibrary.MySQL.mysqlCore;
 
 public class Warrant extends JavaPlugin {
-	public static final Logger log = Logger.getLogger("Minecraft");
 	public mysqlCore mysql;
+	
+	// Plugin
+	private static String name;
+	private static String version;
+	private static String directory;
+	private static WarrantYml config;
+	private static PluginDescriptionFile pd;
+	private static PluginManager pm;
 
-	public void consoleLog(String msg) {
-		log.info("[Warrant] - " + msg);
-	}
+	private final WarrantListener playerListener = new WarrantListener(this);
 
-	public void consoleWarning(String msg) {
-		log.warning("[Warrant] - " + msg);
-	}
+	@Override
+	public void onEnable() {
+		pd = getDescription();
+		pm = getServer().getPluginManager();
+		
+		name = pd.getName();
+		version = pd.getVersion();
+		directory = "plugins" + File.separator + name;
 
-	public void consoleError(String msg) {
-		log.severe("[Warrant] - " + msg);
+		WarrantLogger.initialize(Logger.getLogger("Minecraft"));
+		
+		File configFile = new File(directory + File.separator + "config.yml");
+	    
+        new File(directory).mkdir();
+
+        if(!configFile.exists()){
+            try {
+                // TODO: Copy over default from JAR
+            	//configFile.createNewFile();
+            	WarrantLogger.error("Couldn't find default config.yml! Disabling...");
+            	this.getPluginLoader().disablePlugin(this);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } else {
+    	    config = new WarrantYml(configFile);
+    	    config.load();
+        }
+        
+		WarrantPermissionsHandler.initialize(this);
+		
+		pm.registerEvent(Event.Type.PLAYER_PRELOGIN, this.playerListener, Priority.Low, this);
+		
+    	WarrantLogger.info("Enabled");
 	}
 
 	@Override
 	public void onDisable() {
-		// TODO Auto-generated method stub
-		
+    	WarrantLogger.info("Disabled");
 	}
-
-	@Override
-	public void onEnable() {
-		// TODO Auto-generated method stub
-		
+	
+	public static String getName() {
+		return name;
+	}
+	
+	public static String getVersion() {
+		return version;
 	}
 }
